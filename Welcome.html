@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guntrakon Jittaksa - Interactive OD & HR Tech Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        autox: {
+                            dark: '#0A1128',     // Deep Navy Background
+                            card: '#121E3F',     // Card Background
+                            blue: '#0050f0',     // AutoX Bright Blue
+                            yellow: '#FFC72C',   // AutoX Yellow
+                            orange: '#FF8C00'    // AutoX Orange
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Kanit', 'sans-serif'],
+                        mono: ['Roboto Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Kanit:wght@300;400;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', 'Kanit', sans-serif; background-color: #0A1128; color: #f1f5f9; overflow-x: hidden; scroll-behavior: smooth; }
+        .bg-glow {
+            position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%);
+            width: 900px; height: 900px; 
+            background: radial-gradient(circle, rgba(0, 80, 240, 0.15) 0%, rgba(255, 199, 44, 0.05) 50%, transparent 70%);
+            filter: blur(120px); border-radius: 50%; pointer-events: none; z-index: 0;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0A1128; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0050f0; }
+        
+        .tab-btn.active { background-color: #0050f0; color: #ffffff; border-color: #0050f0; font-weight: 600; }
+        .tab-btn.active .logo-box { background-color: #0A1128; color: #FFC72C; border-color: #FFC72C; }
+        
+        /* Custom UI Mockup Animations */
+        @keyframes fillBar { from { width: 0%; } to { width: var(--target-width); } }
+        @keyframes growUp { from { height: 0%; } to { height: var(--target-height); } }
+        @keyframes dataFlow { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .animate-fill { animation: fillBar 1.5s ease-out forwards; }
+        .animate-grow { animation: growUp 1.5s ease-out forwards; transform-origin: bottom; }
+        .animate-flow { 
+            background: linear-gradient(90deg, transparent, rgba(0, 80, 240, 0.8), transparent);
+            background-size: 200% 100%; animation: dataFlow 2s linear infinite;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-autox-blue/30 selection:text-white">
+
+    <div class="bg-glow"></div>
+
+    <!-- 1. HERO SECTION -->
+    <section class="relative min-h-screen flex flex-col justify-center items-center px-6 md:px-12 lg:px-24 pt-24 pb-10 z-10">
+        <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            <!-- ฝั่งซ้าย: ข้อความและช่องทางติดต่อ -->
+            <div class="lg:col-span-7 flex flex-col items-start order-2 lg:order-1">
+                <div class="gsap-reveal text-autox-yellow font-mono tracking-widest uppercase text-sm mb-4 flex items-center gap-3">
+                    <span class="w-10 h-[1px] bg-autox-yellow"></span> 
+                    Bridging People, Data, and Technology
+                </div>
+
+                <h1 class="gsap-reveal text-5xl md:text-7xl font-extrabold tracking-tight mb-4 leading-tight text-white">
+                    Guntrakon Jittaksa <br />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-autox-blue to-autox-yellow text-4xl md:text-5xl">
+                        <span id="typed-text"></span>
+                    </span>
+                </h1>
+
+                <p class="gsap-reveal text-lg text-slate-400 max-w-2xl mb-8 leading-relaxed">
+                    Strategic Learning & Development Leader with 15 years of experience specializing in Organizational Development, Digital Transformation, and HR Technology. Proven track record in architecting enterprise digital learning ecosystems and leveraging Data Analytics to drive business outcomes.
+                </p>
+
+                <!-- Contact Info -->
+                <div class="gsap-reveal flex flex-wrap items-center gap-8 mt-2 border-l-4 border-autox-yellow pl-6 py-2">
+                    <div class="flex items-center gap-3 text-slate-300">
+                        <i class="fa-solid fa-envelope text-autox-yellow text-xl"></i>
+                        <span class="font-mono text-lg font-bold tracking-wide">Guntrakon@gmail.com</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-300">
+                        <i class="fa-solid fa-phone text-autox-yellow text-xl"></i>
+                        <span class="font-mono text-lg font-bold tracking-wide">0865092797</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ฝั่งขวา: รูปภาพโปรไฟล์ และ KPI Cards -->
+            <div class="lg:col-span-5 flex flex-col gap-6 order-1 lg:order-2 gsap-reveal">
+                
+                <!-- Profile Image -->
+                <div class="relative w-48 h-48 md:w-56 md:h-56 mx-auto lg:ml-auto mb-2">
+                    <!-- Glow Background -->
+                    <div class="absolute inset-0 bg-autox-blue/30 blur-2xl rounded-full"></div>
+                    <!-- รูปโปรไฟล์ของคุณ -->
+                    <img src="https://scontent.fbkk22-6.fna.fbcdn.net/v/t39.30808-6/515541264_10161000794247260_1438007060665206693_n.jpg?stp=dst-jpg_tt6&cstp=mx1236x1236&ctp=s1236x1236&_nc_cat=109&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeGAqB-qbxaXzs5ts8eheWFzUPPebck5NYhQ895tyTk1iKKd6oE0JMyqYf8l-vGQNDI&_nc_ohc=PTZtDFboeO8Q7kNvwFITbHq&_nc_oc=AdregY8hLsuOhUoY-4Gux1AuJ0T3TyfUu3YESWKBdpt_qkGIqhfYg09wtXlayaiIiaUx7vnHOlzxEmfuRFMn8Sfr&_nc_zt=23&_nc_ht=scontent.fbkk22-6.fna&_nc_gid=avczoNv-vCNkk8egjfivxw&_nc_ss=7b2a8&oh=00_AQLB5gi9mN67vN07yRRT2faILcOD3aiVAgQnK9odu1vXGQ&oe=6ABAB146" alt="Guntrakon Jittaksa" class="relative z-10 w-full h-full object-cover rounded-full border-4 border-slate-800 shadow-2xl shadow-black/50 ring-2 ring-autox-blue/50 object-top">
+                </div>
+
+                <!-- Quick KPI Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                    <div class="bg-autox-card/80 border border-slate-700 p-5 rounded-xl backdrop-blur-sm border-l-4 border-l-autox-blue shadow-lg shadow-black/20 flex justify-between items-center hover:bg-slate-800 transition-colors">
+                        <div class="text-slate-400 text-sm font-mono">Total Experience</div>
+                        <div class="text-2xl font-bold text-white">15<span class="text-autox-blue">+</span> <span class="text-sm text-slate-500 font-normal">Years</span></div>
+                    </div>
+                    <div class="bg-autox-card/80 border border-slate-700 p-5 rounded-xl backdrop-blur-sm border-l-4 border-l-autox-yellow shadow-lg shadow-black/20 flex justify-between items-center hover:bg-slate-800 transition-colors">
+                        <div class="text-slate-400 text-sm font-mono">Digital Transformation</div>
+                        <div class="text-2xl font-bold text-white">6<span class="text-autox-yellow">+</span> <span class="text-sm text-slate-500 font-normal">Platforms</span></div>
+                    </div>
+                    <div class="bg-autox-card/80 border border-slate-700 p-5 rounded-xl backdrop-blur-sm border-l-4 border-l-autox-orange shadow-lg shadow-black/20 flex justify-between items-center hover:bg-slate-800 transition-colors">
+                        <div class="text-slate-400 text-sm font-mono">Team Managed</div>
+                        <div class="text-2xl font-bold text-white">4<span class="text-autox-orange">+</span> <span class="text-sm text-slate-500 font-normal">Specialists</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 gsap-reveal">
+            <span class="text-[10px] font-mono tracking-widest text-autox-yellow uppercase">Scroll Down</span>
+            <div class="w-px h-10 bg-gradient-to-b from-autox-yellow to-transparent"></div>
+        </div>
+    </section>
+
+    <!-- WRAPPER -->
+    <div class="relative z-20 bg-autox-dark">
+
+        <!-- 2. PROJECT MOCKUPS & DIGITAL OD CONCEPTS -->
+        <section class="py-24 px-6 md:px-12 lg:px-24 border-t border-white/5 bg-autox-dark">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-16 text-center gsap-up">
+                    <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">Digital OD Solutions Portfolio</h2>
+                    <p class="text-slate-400 font-mono text-sm max-w-2xl mx-auto">
+                        Bridging the gap between HR Strategy and Technical Execution.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    
+                    <!-- Project 6: Enterprise Dashboard -->
+                    <div class="bg-autox-card border border-slate-700 rounded-xl overflow-hidden shadow-2xl flex flex-col group lg:col-span-2 xl:col-span-1 gsap-up">
+                        <div class="bg-[#0f172a] px-4 py-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="text-xs text-slate-400 font-mono bg-autox-dark px-4 py-1 rounded-full">enterprise-performance.dash</div><div></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col xl:flex-row gap-6">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="px-2 py-1 bg-autox-blue/20 text-autox-blue border border-autox-blue/50 rounded text-[10px] font-mono uppercase tracking-wider">Looker Studio</span>
+                                </div>
+                                <h4 class="text-2xl font-bold text-white mb-3">Company-Wide Performance Hub</h4>
+                                <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                    Centralized macro-level analytics hub aggregating data from HRIS and LMS platforms. Built for C-suite to monitor compliance, track L&D ROI, and visualize predictive talent capabilities.
+                                </p>
+                            </div>
+                            
+                            <!-- Animated Dashboard UI -->
+                            <div class="flex-1 bg-slate-900 rounded-xl p-4 flex flex-col gap-3 relative overflow-hidden border border-slate-700">
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="bg-autox-dark border border-slate-700 p-2 rounded shadow-sm flex flex-col justify-center items-center">
+                                        <div class="text-[8px] text-slate-400 uppercase font-bold">Compliance</div>
+                                        <div class="text-green-500 font-bold text-sm">100%</div>
+                                    </div>
+                                    <div class="bg-autox-dark border border-slate-700 p-2 rounded shadow-sm flex flex-col justify-center items-center">
+                                        <div class="text-[8px] text-slate-400 uppercase font-bold">Trained</div>
+                                        <div class="text-autox-blue font-bold text-sm">4,520</div>
+                                    </div>
+                                    <div class="bg-autox-dark border border-slate-700 p-2 rounded shadow-sm flex flex-col justify-center items-center">
+                                        <div class="text-[8px] text-slate-400 uppercase font-bold">Avg Score</div>
+                                        <div class="text-autox-yellow font-bold text-sm">92.4</div>
+                                    </div>
+                                </div>
+                                <div class="bg-autox-dark border border-slate-700 p-3 rounded shadow-sm flex-1 flex items-end gap-2 px-6 border-b-2 border-slate-600">
+                                    <div class="w-full bg-blue-900 rounded-t relative animate-grow" style="--target-height: 40%;"></div>
+                                    <div class="w-full bg-blue-700 rounded-t relative animate-grow" style="--target-height: 60%; animation-delay: 0.2s;"></div>
+                                    <div class="w-full bg-blue-500 rounded-t relative animate-grow" style="--target-height: 85%; animation-delay: 0.4s;"></div>
+                                    <div class="w-full bg-autox-blue rounded-t relative animate-grow" style="--target-height: 100%; animation-delay: 0.6s;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 1: SIXMA -->
+                    <div class="bg-autox-card border border-slate-700 rounded-xl overflow-hidden shadow-2xl flex flex-col group gsap-up">
+                        <div class="bg-[#0f172a] px-4 py-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="text-xs text-slate-400 font-mono bg-autox-dark px-4 py-1 rounded-full">success-profile-calibration.app</div><div></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="px-2 py-1 bg-purple-900/30 text-purple-400 border border-purple-800/50 rounded text-[10px] font-mono uppercase tracking-wider">Behavioral Mapping</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">Digital Competency Calibration (For Talent&Succession Plan)</h4>
+                            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                                Uses A/B choice methodology to eliminate rater bias. Dynamically compares assessed behavioral profiles against baseline Success Profiles (Radar Chart) for targeted succession planning.
+                            </p>
+                            <!-- Radar Chart UI Skeleton -->
+                            <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 mt-auto relative overflow-hidden">
+                                <div class="relative h-[180px] w-full flex justify-center">
+                                    <canvas id="sixmaMockupChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 5: Enterprise Exam -->
+                    <div class="bg-autox-card border border-slate-700 rounded-xl overflow-hidden shadow-2xl flex flex-col group gsap-up">
+                        <div class="bg-[#0f172a] px-4 py-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="text-xs text-slate-400 font-mono bg-autox-dark px-4 py-1 rounded-full">exam-command-center.sys</div><div></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="px-2 py-1 bg-red-900/30 text-red-400 border border-red-800/50 rounded text-[10px] font-mono uppercase tracking-wider">Assessment Security</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">Live Exam Command Center</h4>
+                            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                                A secure, anti-cheating digital assessment platform. Features an Instructor Command Center for live monitoring and a "Smart Resit" algorithmic logic that manages retake permissions.
+                            </p>
+                            <!-- Animated UI Skeleton -->
+                            <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 mt-auto flex flex-col gap-2">
+                                <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                                        <div class="text-[10px] font-bold text-slate-400">LIVE MONITOR</div>
+                                    </div>
+                                </div>
+                                <div class="bg-autox-dark p-2 rounded border-l-2 border-autox-blue flex justify-between items-center relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-autox-blue/10 -translate-x-full animate-[slideRight_2s_infinite]"></div>
+                                    <div class="flex items-center gap-2 relative z-10"><div class="w-5 h-5 rounded-full bg-slate-700"></div><div class="h-2 w-16 bg-slate-600 rounded"></div></div>
+                                    <div class="text-[9px] font-bold text-autox-blue relative z-10">DOING...</div>
+                                </div>
+                                <div class="bg-autox-dark p-2 rounded border-l-2 border-autox-yellow flex justify-between items-center">
+                                    <div class="flex items-center gap-2"><div class="w-5 h-5 rounded-full bg-slate-700"></div><div class="h-2 w-20 bg-slate-600 rounded"></div></div>
+                                    <div class="h-4 px-2 bg-autox-yellow/20 text-autox-yellow rounded text-[8px] flex items-center justify-center font-bold">SMART RESIT</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project 4: Training Matrix & Compliance -->
+                    <div class="bg-autox-card border border-slate-700 rounded-xl overflow-hidden shadow-2xl flex flex-col group gsap-up">
+                        <div class="bg-[#0f172a] px-4 py-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex gap-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="text-xs text-slate-400 font-mono bg-autox-dark px-4 py-1 rounded-full">enterprise-training-matrix.sys</div><div></div>
+                        </div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="px-2 py-1 bg-teal-900/30 text-teal-400 border border-teal-800/50 rounded text-[10px] font-mono uppercase tracking-wider">Workflow Auth</span>
+                            </div>
+                            <h4 class="text-xl font-bold text-white mb-2">Training Matrix Approval System</h4>
+                            <p class="text-slate-400 text-sm mb-6 leading-relaxed">
+                                Role-Based Access Control (RBAC) system for compliance matrices. Eliminates manual paper trails through automated routing and electronic signature captures.
+                            </p>
+                            <!-- Animated Workflow UI Skeleton -->
+                            <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 mt-auto flex flex-col gap-3 relative">
+                                <div class="absolute left-[38px] top-12 bottom-12 w-1 bg-slate-700 rounded"><div class="h-full w-full animate-flow rounded"></div></div>
+                                <div class="flex items-center gap-3 relative z-10">
+                                    <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center shadow-md"><i class="fa-solid fa-check"></i></div>
+                                    <div class="flex-1 bg-autox-dark p-2 rounded shadow-sm border border-slate-700">
+                                        <div class="flex justify-between items-center mb-1"><div class="h-2 w-1/3 bg-slate-600 rounded"></div><div class="text-[8px] font-bold text-slate-400">PREPARER</div></div>
+                                        <div class="h-1.5 w-1/4 bg-slate-700 rounded"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 relative z-10">
+                                    <div class="w-10 h-10 rounded-full bg-autox-dark border-2 border-autox-orange text-autox-orange flex items-center justify-center shadow-sm animate-pulse"><i class="fa-solid fa-hourglass-half"></i></div>
+                                    <div class="flex-1 bg-autox-dark p-2 rounded shadow-sm border border-autox-orange/50">
+                                        <div class="flex justify-between items-center mb-1"><div class="h-2 w-1/3 bg-slate-600 rounded"></div><div class="text-[8px] font-bold text-autox-orange">APPROVER</div></div>
+                                        <div class="h-1.5 w-1/2 bg-slate-700 rounded"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. INTERACTIVE EXPERIENCE DASHBOARD -->
+        <section class="py-20 px-6 md:px-12 lg:px-24 bg-[#080d1e]">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-12 flex flex-col md:flex-row justify-between items-end gsap-up">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Professional Impact</h2>
+                        <p class="text-slate-400 font-mono text-sm">Track Record of Delivery, OD & Transformation</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 gsap-up">
+                    <!-- Tabs -->
+                    <div class="md:col-span-4 flex flex-col gap-3">
+                        <button class="tab-btn active text-left px-4 py-4 rounded-xl border border-slate-700 bg-autox-card transition-all text-slate-300 flex items-center gap-4 group" onclick="showExp('aviation', this)">
+                            <div class="logo-box w-12 h-12 rounded-lg bg-autox-dark border border-slate-700 flex items-center justify-center text-slate-400 font-bold shrink-0 transition-colors">
+                                <i class="fa-solid fa-plane-departure"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">Aviation Sector</div>
+                                <div class="text-sm opacity-80">2018 - Present</div>
+                            </div>
+                        </button>
+                        <button class="tab-btn text-left px-4 py-4 rounded-xl border border-slate-700 bg-autox-card hover:border-autox-blue transition-all text-slate-300 flex items-center gap-4 group" onclick="showExp('insurance', this)">
+                            <div class="logo-box w-12 h-12 rounded-lg bg-autox-dark border border-slate-700 flex items-center justify-center text-slate-400 font-bold shrink-0 transition-colors">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">Insurance Sector</div>
+                                <div class="text-sm opacity-80">2014 - 2018</div>
+                            </div>
+                        </button>
+                        <button class="tab-btn text-left px-4 py-4 rounded-xl border border-slate-700 bg-autox-card hover:border-autox-blue transition-all text-slate-300 flex items-center gap-4 group" onclick="showExp('realestate', this)">
+                            <div class="logo-box w-12 h-12 rounded-lg bg-autox-dark border border-slate-700 flex items-center justify-center text-slate-400 font-bold shrink-0 transition-colors">
+                                <i class="fa-solid fa-building"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">Real Estate Sector</div>
+                                <div class="text-sm opacity-80">2010 - 2014</div>
+                            </div>
+                        </button>
+                        <button class="tab-btn text-left px-4 py-4 rounded-xl border border-slate-700 bg-autox-card hover:border-autox-blue transition-all text-slate-300 flex items-center gap-4 group" onclick="showExp('banking', this)">
+                            <div class="logo-box w-12 h-12 rounded-lg bg-autox-dark border border-slate-700 flex items-center justify-center text-slate-400 font-bold shrink-0 transition-colors">
+                                <i class="fa-solid fa-piggy-bank"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">Banking Sector</div>
+                                <div class="text-sm opacity-80">2009 - 2010</div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div class="md:col-span-8 bg-autox-card border border-slate-700 rounded-2xl p-8 relative min-h-[350px]">
+                        <!-- Aviation -->
+                        <div id="exp-aviation" class="exp-content block animate-[fadeIn_0.5s_ease-in-out]">
+                            <h3 class="text-2xl font-bold text-white">Learning Strategy and Technology Manager</h3>
+                            <p class="text-autox-yellow font-mono text-sm mb-6 mt-1">Leading Aviation Enterprise | 2018-Present</p>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Direct a team of OD & Learning specialists to execute enterprise-wide learning strategies and foster a digital-first learning culture across 5,000+ employees.</span></li>
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Architected the complete Digital Learning Ecosystem (LMS/PMS/TMS), transitioning the organization from traditional training to self-directed digital learning.</span></li>
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Led Change Management initiatives for digital transformation, accelerating the adoption of new technologies and data intelligence tools.</span></li>
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Transformed complex training and performance datasets into Actionable Business Insights using Looker Studio.</span></li>
+                            </ul>
+                        </div>
+                        <!-- Insurance -->
+                        <div id="exp-insurance" class="exp-content hidden animate-[fadeIn_0.5s_ease-in-out]">
+                            <h3 class="text-2xl font-bold text-white">HR Business Partner (L&D)</h3>
+                            <p class="text-autox-yellow font-mono text-sm mb-6 mt-1">Leading Insurance PLC | 2014-2018</p>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Partnered with executive leadership to implement robust performance management frameworks, shifting the culture towards outcome-driven KPIs.</span></li>
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Conducted comprehensive organizational capability audits and executed targeted interventions to close critical skill gaps.</span></li>
+                            </ul>
+                        </div>
+                        <!-- Real Estate -->
+                        <div id="exp-realestate" class="exp-content hidden animate-[fadeIn_0.5s_ease-in-out]">
+                            <h3 class="text-2xl font-bold text-white">Corporate Member Enhancement Officer</h3>
+                            <p class="text-autox-yellow font-mono text-sm mb-6 mt-1">Magnolia Quality Development Corporation (MQDC) | 2010-2014</p>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Championed the Enterprise Knowledge Management (KM) Project, standardizing best practices.</span></li>
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Directed Management Trainee programs, accelerating the development of high-potential talents.</span></li>
+                            </ul>
+                        </div>
+                        <!-- Banking -->
+                        <div id="exp-banking" class="exp-content hidden animate-[fadeIn_0.5s_ease-in-out]">
+                            <h3 class="text-2xl font-bold text-white">HR Officer (Employee Relations)</h3>
+                            <p class="text-autox-yellow font-mono text-sm mb-6 mt-1">Kiatnakin Bank Public Company Limited | 2009-2010</p>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Managed employee well-being programs and recognition initiatives to enhance organizational engagement.</span></li>
+                                <li class="flex gap-3"><i class="fa-solid fa-check text-autox-blue mt-1"></i> <span>Administered employee welfare services and streamlined reporting for the Social Security Office.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ACADEMIC BACKGROUND & SKILLS DASHBOARD -->
+        <section class="py-20 px-6 md:px-12 lg:px-24 bg-autox-dark border-t border-white/5">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    
+                    <!-- Strengths List -->
+                    <div class="flex flex-col gsap-up">
+                        <h2 class="text-2xl font-bold text-white mb-6 border-b border-slate-700 pb-4">Top 5 CliftonStrengths</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-4 bg-autox-card p-4 rounded-xl border border-slate-700 hover:border-autox-blue/50 transition-colors shadow-lg">
+                                <div class="w-12 h-12 rounded-lg bg-autox-blue/20 text-autox-blue flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-book-open"></i></div>
+                                <div><div class="font-bold text-white text-lg">Learner</div><div class="text-sm text-slate-400">Continuous capability building & system improvement</div></div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-autox-card p-4 rounded-xl border border-slate-700 hover:border-autox-blue/50 transition-colors shadow-lg">
+                                <div class="w-12 h-12 rounded-lg bg-autox-yellow/20 text-autox-yellow flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-lightbulb"></i></div>
+                                <div><div class="font-bold text-white text-lg">Ideation</div><div class="text-sm text-slate-400">Designing innovative OD interventions & digital cultures</div></div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-autox-card p-4 rounded-xl border border-slate-700 hover:border-autox-blue/50 transition-colors shadow-lg">
+                                <div class="w-12 h-12 rounded-lg bg-autox-orange/20 text-autox-orange flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-wrench"></i></div>
+                                <div><div class="font-bold text-white text-lg">Restorative</div><div class="text-sm text-slate-400">Resolving performance gaps & systemic business friction</div></div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-autox-card p-4 rounded-xl border border-slate-700 hover:border-autox-blue/50 transition-colors shadow-lg">
+                                <div class="w-12 h-12 rounded-lg bg-autox-blue/20 text-autox-blue flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-chart-simple"></i></div>
+                                <div><div class="font-bold text-white text-lg">Analytical</div><div class="text-sm text-slate-400">Transforming datasets into predictive people insights</div></div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-autox-card p-4 rounded-xl border border-slate-700 hover:border-autox-blue/50 transition-colors shadow-lg">
+                                <div class="w-12 h-12 rounded-lg bg-autox-yellow/20 text-autox-yellow flex items-center justify-center shrink-0 text-xl"><i class="fa-solid fa-chess-knight"></i></div>
+                                <div><div class="font-bold text-white text-lg">Strategic</div><div class="text-sm text-slate-400">Architecting long-term enterprise learning strategies</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Academic & Technical Skills -->
+                    <div class="flex flex-col justify-between gsap-up">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white mb-6 border-b border-slate-700 pb-4">Academic Background</h2>
+                            <ul class="space-y-4 text-slate-300">
+                                <li class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded bg-autox-card border border-slate-700 flex items-center justify-center shrink-0 mt-1"><i class="fa-solid fa-graduation-cap text-autox-yellow"></i></div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-slate-200 leading-tight">Master of Science in Technopreneurship & Innovation</h4>
+                                        <p class="text-slate-400 text-sm">Chulalongkorn University</p>
+                                    </div>
+                                </li>
+                                <li class="flex items-start gap-4">
+                                    <div class="w-10 h-10 rounded bg-autox-card border border-slate-700 flex items-center justify-center shrink-0 mt-1"><i class="fa-solid fa-university text-autox-yellow"></i></div>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-slate-200 leading-tight">Bachelor of Arts in Social Administration</h4>
+                                        <p class="text-slate-400 text-sm">Thammasat University</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-8">
+                            <h2 class="text-2xl font-bold text-white mb-6 border-b border-slate-700 pb-4">Core Competencies & Tools</h2>
+                            <div class="mb-4">
+                                <span class="text-sm text-slate-400 block mb-2 font-mono">Data, Analytics & Tech</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-autox-blue/20 text-autox-blue border border-autox-blue/50 rounded-full text-sm">Looker Studio</span>
+                                    <span class="px-3 py-1 bg-autox-blue/20 text-autox-blue border border-autox-blue/50 rounded-full text-sm">Google Sheets (Advanced)</span>
+                                    <span class="px-3 py-1 bg-autox-blue/20 text-autox-blue border border-autox-blue/50 rounded-full text-sm">Excel</span>
+                                    <span class="px-3 py-1 bg-autox-blue/20 text-autox-blue border border-autox-blue/50 rounded-full text-sm">Visual Studio</span>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <span class="text-sm text-slate-400 block mb-2 font-mono">Learning Tech & Multimedia</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-autox-yellow/20 text-autox-yellow border border-autox-yellow/50 rounded-full text-sm">Articulate Storyline 360</span>
+                                    <span class="px-3 py-1 bg-autox-yellow/20 text-autox-yellow border border-autox-yellow/50 rounded-full text-sm">Adobe Captivate</span>
+                                    <span class="px-3 py-1 bg-autox-yellow/20 text-autox-yellow border border-autox-yellow/50 rounded-full text-sm">LMS Administration</span>
+                                    <span class="px-3 py-1 bg-autox-yellow/20 text-autox-yellow border border-autox-yellow/50 rounded-full text-sm">Kahoot</span>
+                                    <span class="px-3 py-1 bg-autox-orange/20 text-autox-orange border border-autox-orange/50 rounded-full text-sm">Adobe Photoshop</span>
+                                    <span class="px-3 py-1 bg-autox-orange/20 text-autox-orange border border-autox-orange/50 rounded-full text-sm">Premiere Pro</span>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <span class="text-sm text-slate-400 block mb-2 font-mono">Internal Courses Taught</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-sm">Data Management 101</span>
+                                    <span class="px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-sm">Data Management 102</span>
+                                    <span class="px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-sm">Google Workspace</span>
+                                    <span class="px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-sm">Looker Studio</span>
+                                    <span class="px-3 py-1 bg-slate-800 text-slate-300 border border-slate-700 rounded-full text-sm">eLearning Production by Storyline</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <footer class="py-8 bg-[#040814] text-center text-slate-600 text-sm border-t border-slate-800">
+            Designed for Guntrakon Jittaksa &copy; 2026 | OD & HR Tech Portfolio
+        </footer>
+
+    </div> <!-- END WRAPPER -->
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <script>
+        // 1. Typed.js
+        new Typed('#typed-text', {
+            strings: ['Strategic L&D Leader.', 'Data-Driven OD.', 'HR Tech Architect.'],
+            typeSpeed: 50, backSpeed: 30, backDelay: 2000, loop: true, showCursor: true, cursorChar: '|'
+        });
+
+        // 2. GSAP Animations (Standard Smooth Scroll)
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero Reveal
+        gsap.fromTo(".gsap-reveal", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, stagger: 0.15, ease: "power3.out", delay: 0.2 });
+        
+        // Standard Section Fade Up
+        gsap.utils.toArray('.gsap-up').forEach(element => {
+            gsap.fromTo(element, 
+                { y: 50, opacity: 0 },
+                { scrollTrigger: { trigger: element, start: "top 85%" }, y: 0, opacity: 1, duration: 0.8, ease: "power3.out" }
+            );
+        });
+
+        // 3. Tab Logic for Experience Section
+        function showExp(id, btnElement) {
+            document.querySelectorAll('.exp-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            const target = document.getElementById('exp-' + id);
+            target.classList.remove('hidden');
+            target.classList.add('block');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.querySelector('.logo-box').classList.remove('text-autox-yellow', 'border-autox-yellow');
+                btn.querySelector('.logo-box').classList.add('text-slate-400', 'border-slate-700');
+            });
+            btnElement.classList.add('active');
+            btnElement.querySelector('.logo-box').classList.remove('text-slate-400', 'border-slate-700');
+            btnElement.querySelector('.logo-box').classList.add('text-autox-yellow', 'border-autox-yellow');
+        }
+
+        // 4. SIXMA Mockup Radar Chart
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        const ctxSixma = document.getElementById('sixmaMockupChart').getContext('2d');
+        new Chart(ctxSixma, {
+            type: 'radar',
+            data: {
+                labels: ['C1', 'C2', 'C3', 'C4', 'C5', 'C6'],
+                datasets: [
+                    {
+                        label: 'Target Profile',
+                        data: [4, 4, 3, 4, 3, 5],
+                        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                        borderColor: 'rgba(148, 163, 184, 0.5)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'rgba(148, 163, 184, 1)',
+                        pointRadius: 2
+                    },
+                    {
+                        label: 'Assessed Profile',
+                        data: [3, 4, 2, 4, 4, 4],
+                        backgroundColor: 'rgba(0, 80, 240, 0.2)', // AutoX Blue tint
+                        borderColor: 'rgba(0, 80, 240, 0.8)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(0, 80, 240, 1)',
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                scales: { 
+                    r: { 
+                        angleLines: { color: 'rgba(255,255,255,0.05)' },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { display: false, min: 0, max: 5 },
+                        pointLabels: { font: { size: 10 } }
+                    } 
+                }, 
+                plugins: { legend: { display: false } } 
+            }
+        });
+    </script>
+</body>
+</html>
